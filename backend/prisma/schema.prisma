@@ -1,0 +1,153 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String      @id @default(uuid())
+  email         String      @unique
+  password      String
+  name          String
+  roleId        String
+  role          Role        @relation(fields: [roleId], references: [id])
+  progress      Progress[]
+  activities    Activity[]
+  reports       Report[]
+  reviews       Review[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@map("users")
+}
+
+model Role {
+  id              String           @id @default(uuid())
+  name            String           @unique
+  description     String?
+  users           User[]
+  rolePermissions RolePermission[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@map("roles")
+}
+
+model Permission {
+  id              String           @id @default(uuid())
+  name            String           @unique
+  description     String?
+  rolePermissions RolePermission[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  id           String     @id @default(uuid())
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id])
+  permission   Permission @relation(fields: [permissionId], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@unique([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model Material {
+  id          String     @id @default(uuid())
+  title       String
+  description String?
+  content     String
+  categoryId  String
+  category    Category   @relation(fields: [categoryId], references: [id])
+  progress    Progress[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@map("materials")
+}
+
+model Category {
+  id          String     @id @default(uuid())
+  name        String     @unique
+  description String?
+  materials   Material[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@map("categories")
+}
+
+model Progress {
+  id          String   @id @default(uuid())
+  userId      String
+  materialId  String
+  score       Float?
+  status      String   @default("not_started") // not_started, in_progress, completed
+  user        User     @relation(fields: [userId], references: [id])
+  material    Material @relation(fields: [materialId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, materialId])
+  @@map("progress")
+}
+
+model Activity {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  userId      String  // Creator of the activity (teacher/parent)
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("activities")
+}
+
+model Report {
+  id                String   @id @default(uuid())
+  userId            String   // The child this report is for
+  progressSummary   String
+  reviews           Review[]
+  user              User     @relation(fields: [userId], references: [id])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("reports")
+}
+
+model Review {
+  id          String   @id @default(uuid())
+  content     String
+  userId      String   // Reviewer (teacher/parent)
+  reportId    String
+  user        User     @relation(fields: [userId], references: [id])
+  report      Report   @relation(fields: [reportId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("reviews")
+}
+
+model Game {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  difficulty  String   // easy, medium, hard
+  content     String   // JSON containing game data
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("games")
+}
