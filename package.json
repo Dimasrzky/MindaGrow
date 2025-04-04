@@ -1,0 +1,26 @@
+{
+    "name": "mindagrow",
+    "version": "0.1.0",
+    "description": "Platform pendidikan anak personalisasi",
+    "private": true,
+    "scripts": {
+      "setup": "./scripts/setup.sh",
+      "dev:frontend": "cd frontend && npm run dev",
+      "dev:backend": "cd backend && npm run start:dev",
+      "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+      "build:frontend": "cd frontend && npm run build",
+      "build:backend": "cd backend && npm run build",
+      "build": "npm run build:frontend && npm run build:backend",
+      "start:frontend": "cd frontend && npm start",
+      "start:backend": "cd backend && npm start",
+      "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
+      "db:migrate": "cd backend && npx prisma migrate dev",
+      "db:seed": "cd backend && npm run seed",
+      "docker:up": "cd infrastructure/docker && docker-compose up -d",
+      "docker:down": "cd infrastructure/docker && docker-compose down",
+      "deploy": "./scripts/deploy.sh"
+    },
+    "devDependencies": {
+      "concurrently": "^8.2.0"
+    }
+  }
