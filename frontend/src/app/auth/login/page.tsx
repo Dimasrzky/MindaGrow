@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { useAuth } from '@/hooks/useAuth'
+import { useAuth } from '@/hooks/userAuth'
 import { Icons } from '@/components/ui/icons'
 
 const formSchema = z.object({

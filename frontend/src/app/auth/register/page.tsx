@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { useAuth } from '@/hooks/useAuth'
+import { useAuth } from '@/hooks/userAuth'
 import { Icons } from '@/components/ui/icons'
 
 const formSchema = z.object({
