@@ -2,17 +2,15 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
+import { useRouter } from 'next/navigation'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { useAuth } from '@/hooks/userAuth'
-import { Icons } from '@/components/ui/icons'
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Email tidak valid' }),
@@ -20,7 +18,6 @@ const formSchema = z.object({
 })
 
 export default function LoginPage() {
-  const { login } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
@@ -38,7 +35,14 @@ export default function LoginPage() {
     setError('')
     
     try {
-      await login(values.email, values.password)
+      // Simulasi login untuk demo
+      // Pada implementasi nyata, ini akan memanggil API
+      console.log('Login submitted:', values)
+      
+      // Simulasi delay
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      // Redirect ke dashboard (sesuaikan berdasarkan role user)
       router.push('/dashboard/student')
     } catch (error: any) {
       setError(error.message || 'Terjadi kesalahan saat login')
@@ -81,7 +85,7 @@ export default function LoginPage() {
                     <FormItem>
                       <div className="flex items-center justify-between">
                         <FormLabel>Password</FormLabel>
-                        <Link href="/forgot-password" className="text-xs text-primary hover:underline">
+                        <Link href="/auth/forgot-password" className="text-xs text-primary hover:underline">
                           Lupa password?
                         </Link>
                       </div>
@@ -98,14 +102,7 @@ export default function LoginPage() {
                 )}
                 
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? (
-                    <>
-                      <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-                      Loading...
-                    </>
-                  ) : (
-                    'Login'
-                  )}
+                  {isLoading ? 'Memproses...' : 'Login'}
                 </Button>
               </form>
             </Form>
@@ -113,7 +110,7 @@ export default function LoginPage() {
           <CardFooter className="flex flex-col items-center">
             <div className="text-xs text-muted-foreground mt-4">
               Belum punya akun?{' '}
-              <Link href="/register" className="text-primary hover:underline">
+              <Link href="/auth/register" className="text-primary hover:underline">
                 Daftar sekarang
               </Link>
             </div>

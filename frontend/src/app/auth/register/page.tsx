@@ -2,18 +2,16 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
+import { useRouter } from 'next/navigation'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { useAuth } from '@/hooks/userAuth'
-import { Icons } from '@/components/ui/icons'
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Nama minimal 2 karakter' }),
@@ -29,7 +27,6 @@ const formSchema = z.object({
 });
 
 export default function RegisterPage() {
-  const { register } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
@@ -50,7 +47,14 @@ export default function RegisterPage() {
     setError('')
     
     try {
-      await register(values.name, values.email, values.password, values.role)
+      // Simulasi registrasi untuk demo
+      // Pada implementasi nyata, ini akan memanggil API
+      console.log('Registration submitted:', values)
+      
+      // Simulasi delay
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      // Redirect ke dashboard berdasarkan role
       router.push(`/dashboard/${values.role}`)
     } catch (error: any) {
       setError(error.message || 'Terjadi kesalahan saat pendaftaran')
@@ -60,143 +64,138 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex flex-col justify-center space-y-6 w-full px-4 sm:px-0">
-      <div className="flex flex-col space-y-2 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight">Buat akun baru</h1>
-        <p className="text-sm text-muted-foreground">
-          Daftar untuk mengakses platform pendidikan anak personalisasi
-        </p>
-      </div>
+    <div className="container flex min-h-screen items-center justify-center py-8">
+      <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[450px]">
+        <div className="flex flex-col space-y-2 text-center">
+          <h1 className="text-2xl font-semibold tracking-tight">Buat akun baru</h1>
+          <p className="text-sm text-muted-foreground">
+            Daftar untuk mengakses platform pendidikan anak personalisasi
+          </p>
+        </div>
 
-      <Card>
-        <CardContent className="pt-6">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nama Lengkap</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Nama Anda" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+        <Card>
+          <CardContent className="pt-6">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nama Lengkap</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Nama Anda" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="nama@contoh.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="Password Anda" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Konfirmasi Password</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="Ulangi password" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="role"
+                  render={({ field }) => (
+                    <FormItem className="space-y-3">
+                      <FormLabel>Pilih Role</FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          className="flex flex-col space-y-1"
+                        >
+                          <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="student" />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              Anak/Siswa
+                            </FormLabel>
+                          </FormItem>
+                          <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="parent" />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              Orang Tua
+                            </FormLabel>
+                          </FormItem>
+                          <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="teacher" />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              Guru
+                            </FormLabel>
+                          </FormItem>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                {error && (
+                  <div className="text-sm text-destructive">{error}</div>
                 )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="nama@contoh.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="Password Anda" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Konfirmasi Password</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="Ulangi password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="role"
-                render={({ field }) => (
-                  <FormItem className="space-y-3">
-                    <FormLabel>Pilih Role</FormLabel>
-                    <FormControl>
-                      <RadioGroup
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        className="flex flex-col space-y-1"
-                      >
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="student" />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            Anak/Siswa
-                          </FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="parent" />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            Orang Tua
-                          </FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="teacher" />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            Guru
-                          </FormLabel>
-                        </FormItem>
-                      </RadioGroup>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              {error && (
-                <div className="text-sm text-destructive">{error}</div>
-              )}
-              
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-                    Loading...
-                  </>
-                ) : (
-                  'Daftar'
-                )}
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-        <CardFooter className="flex flex-col items-center">
-          <div className="text-xs text-muted-foreground mt-4">
-            Sudah punya akun?{' '}
-            <Link href="/login" className="text-primary hover:underline">
-              Login
-            </Link>
-          </div>
-        </CardFooter>
-      </Card>
+                
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? 'Memproses...' : 'Daftar'}
+                </Button>
+              </form>
+            </Form>
+          </CardContent>
+          <CardFooter className="flex flex-col items-center">
+            <div className="text-xs text-muted-foreground mt-4">
+              Sudah punya akun?{' '}
+              <Link href="/auth/login" className="text-primary hover:underline">
+                Login
+              </Link>
+            </div>
+          </CardFooter>
+        </Card>
+      </div>
     </div>
   )
 }
