@@ -5,6 +5,40 @@ import { Button } from '@/components/ui/button'
 export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen">
+      {/* Header/Navigation */}
+      <header className="w-full py-4 bg-white border-b border-gray-200 dark:bg-gray-950 dark:border-gray-800">
+        <div className="container px-4 md:px-6 flex items-center justify-between">
+          <Link href="/" className="flex items-center space-x-2">
+            <div className="relative h-8 w-8">
+              <Image src="/logo.svg" alt="MindaGrow Logo" fill className="object-contain" />
+            </div>
+            <span className="text-xl font-bold">MindaGrow</span>
+          </Link>
+          <nav className="hidden md:flex items-center gap-6">
+            <Link href="#features" className="text-sm font-medium hover:text-primary">
+              Fitur
+            </Link>
+            <Link href="#testimonials" className="text-sm font-medium hover:text-primary">
+              Testimoni
+            </Link>
+            <Link href="#" className="text-sm font-medium hover:text-primary">
+              Harga
+            </Link>
+            <Link href="#" className="text-sm font-medium hover:text-primary">
+              Kontak
+            </Link>
+          </nav>
+          <div className="flex items-center gap-4">
+            <Link href="/auth/login">
+              <Button variant="outline" size="sm">Login</Button>
+            </Link>
+            <Link href="/auth/register" className="hidden md:inline-flex">
+              <Button size="sm">Daftar</Button>
+            </Link>
+          </div>
+        </div>
+      </header>
+
       <main className="flex-1">
         {/* Hero Section */}
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
@@ -40,7 +74,7 @@ export default function HomePage() {
         </section>
 
         {/* Features Section */}
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800">
+        <section id="features" className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
@@ -69,7 +103,7 @@ export default function HomePage() {
         </section>
 
         {/* Testimonials Section */}
-        <section className="w-full py-12 md:py-24 lg:py-32">
+        <section id="testimonials" className="w-full py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
@@ -101,26 +135,126 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+
+        {/* Call to Action */}
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-primary text-white">
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center">
+              <div className="space-y-2">
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+                  Siap Memulai?
+                </h2>
+                <p className="max-w-[600px] text-primary-foreground/80 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                  Gabung sekarang dan berikan anak Anda pengalaman belajar terbaik
+                </p>
+              </div>
+              <div className="flex flex-col gap-2 min-[400px]:flex-row">
+                <Link href="/auth/register">
+                  <Button size="lg" variant="secondary">Daftar Gratis</Button>
+                </Link>
+                <Link href="/auth/login">
+                  <Button size="lg" variant="outline" className="bg-transparent border-white text-white hover:bg-white/10">
+                    Login
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
 
       {/* Footer */}
       <footer className="w-full py-6 bg-gray-100 dark:bg-gray-800">
         <div className="container px-4 md:px-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="text-center md:text-left">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <div className="relative h-8 w-8">
+                  <Image src="/logo.svg" alt="MindaGrow Logo" fill className="object-contain" />
+                </div>
+                <span className="text-xl font-bold">MindaGrow</span>
+              </div>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                © 2025 MindaGrow. Hak Cipta Dilindungi.
+                Platform pendidikan digital personalisasi untuk perkembangan kognitif anak.
               </p>
             </div>
+            <div>
+              <h3 className="text-sm font-medium mb-3">Perusahaan</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="#" className="text-sm text-gray-500 hover:text-primary dark:text-gray-400">
+                    Tentang Kami
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="text-sm text-gray-500 hover:text-primary dark:text-gray-400">
+                    Karir
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="text-sm text-gray-500 hover:text-primary dark:text-gray-400">
+                    Blog
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-sm font-medium mb-3">Bantuan</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="#" className="text-sm text-gray-500 hover:text-primary dark:text-gray-400">
+                    FAQ
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="text-sm text-gray-500 hover:text-primary dark:text-gray-400">
+                    Kontak
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="text-sm text-gray-500 hover:text-primary dark:text-gray-400">
+                    Dukungan
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-sm font-medium mb-3">Legal</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="#" className="text-sm text-gray-500 hover:text-primary dark:text-gray-400">
+                    Syarat & Ketentuan
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="text-sm text-gray-500 hover:text-primary dark:text-gray-400">
+                    Kebijakan Privasi
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="text-sm text-gray-500 hover:text-primary dark:text-gray-400">
+                    Cookies
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 border-t border-gray-200 dark:border-gray-700 pt-4">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              © 2025 MindaGrow. Hak Cipta Dilindungi.
+            </p>
             <div className="flex space-x-4">
-              <Link href="#" className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
-                Syarat & Ketentuan
+              <Link href="#" className="text-gray-500 hover:text-primary dark:text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+                <span className="sr-only">Facebook</span>
               </Link>
-              <Link href="#" className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
-                Kebijakan Privasi
+              <Link href="#" className="text-gray-500 hover:text-primary dark:text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path></svg>
+                <span className="sr-only">Twitter</span>
               </Link>
-              <Link href="#" className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
-                Kontak
+              <Link href="#" className="text-gray-500 hover:text-primary dark:text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg>
+                <span className="sr-only">Instagram</span>
               </Link>
             </div>
           </div>
