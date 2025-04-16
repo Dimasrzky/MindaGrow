@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { useAuth } from '@/hooks/useAuth';
+import { User } from '@/hooks/useAuth';
 
 interface UserProfile {
   id: string;
