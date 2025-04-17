@@ -1,157 +1,171 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { login as apiLogin, register as apiRegister, logout as apiLogout, refreshToken } from '@/lib/api/auth';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { authStore } from '@/store/authStore';
 
-export interface LoginData {
-  email: string;
-  password: string;
-}
-
-export interface RegisterData {
-  name: string;
-  email: string;
-  password: string;
-  role: 'student' | 'parent' | 'teacher';
-}
-
+// Define User interface for better type checking
 export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'student' | 'parent' | 'teacher' | 'admin';
+  role: string;
   avatarUrl?: string;
-  lastLoginAt?: Date;
+  lastLoginAt?: Date | string;
 }
 
-export const useAuth = () => {
+export function useAuth() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { setItem, removeItem, getItem } = useLocalStorage();
-  
-  // Use Zustand store for global auth state
-  const { 
-    user, 
-    setUser, 
-    isAuthenticated, 
-    setIsAuthenticated,
-    clearAuth
-  } = authStore();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Initialize auth state from localStorage on mount
+  // Helper function to safely set user with type compatibility
+  const safeSetUser = (userData: any) => {
+    // Make sure lastLoginAt is properly handled regardless of format
+    if (userData && userData.lastLoginAt && typeof userData.lastLoginAt === 'string') {
+      userData.lastLoginAt = new Date(userData.lastLoginAt);
+    }
+    setUser(userData);
+  };
+
   useEffect(() => {
-    const initializeAuth = async () => {
-      setIsLoading(true);
+    // Check token in localStorage during initialization
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+    
+    if (token && userData) {
       try {
-        const storedUser = getItem('user');
-        const storedToken = getItem('token');
-
-        if (storedToken && storedUser) {
-          // Validate token by refreshing it
-          const refreshResult = await refreshToken();
-          if (refreshResult.success) {
-            setUser(JSON.parse(storedUser));
-            setIsAuthenticated(true);
-            setItem('token', refreshResult.token);
-          } else {
-            // Token is invalid, clear auth state
-            clearAuth();
-            removeItem('user');
-            removeItem('token');
-          }
-        }
+        const parsedUser = JSON.parse(userData);
+        safeSetUser(parsedUser);
       } catch (error) {
-        console.error('Error initializing auth:', error);
-        clearAuth();
-        removeItem('user');
-        removeItem('token');
-      } finally {
-        setIsLoading(false);
+        console.error('Error parsing user data from localStorage:', error);
+        // Clear invalid data
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
       }
-    };
-
-    initializeAuth();
+    }
+    
+    setLoading(false);
   }, []);
 
-  // Login function
-  const login = useCallback(async (data: LoginData) => {
-    setIsLoading(true);
+  const login = useCallback(async (email: string, password: string) => {
+    setLoading(true);
     try {
-      const response = await apiLogin(data);
+      // Simulate login for development
+      // In a real implementation, you would fetch from your API
+      let userData: User;
       
-      if (response.success) {
-        const { user, token } = response;
-        setUser(user);
-        setIsAuthenticated(true);
-        setItem('user', JSON.stringify(user));
-        setItem('token', token);
-        
-        // Redirect based on user role
-        router.push(`/${user.role}`);
-        return { success: true };
+      // Demo mode with predefined users
+      if (email.includes('student')) {
+        userData = {
+          id: '1',
+          name: 'Student',
+          email,
+          role: 'student',
+          lastLoginAt: new Date()
+        };
+      } else if (email.includes('parent')) {
+        userData = {
+          id: '2',
+          name: 'Parent',
+          email,
+          role: 'parent',
+          lastLoginAt: new Date()
+        };
+      } else if (email.includes('teacher')) {
+        userData = {
+          id: '3',
+          name: 'Teacher',
+          email,
+          role: 'teacher',
+          lastLoginAt: new Date()
+        };
       } else {
-        return { success: false, error: response.error || 'Login failed' };
+        // Default user for testing
+        userData = {
+          id: '1',
+          name: 'User Test',
+          email,
+          role: 'student',
+          lastLoginAt: new Date()
+        };
       }
-    } catch (error: any) {
+      
+      // Store token and user data in localStorage
+      // Convert Date to string for storage
+      const userForStorage = {
+        ...userData,
+        lastLoginAt: userData.lastLoginAt instanceof Date 
+          ? userData.lastLoginAt.toISOString() 
+          : userData.lastLoginAt
+      };
+      
+      localStorage.setItem('token', 'mock-jwt-token');
+      localStorage.setItem('user', JSON.stringify(userForStorage));
+      
+      // Set user state
+      safeSetUser(userData);
+      return userData;
+    } catch (error) {
       console.error('Login error:', error);
-      return { success: false, error: error.message || 'An unexpected error occurred' };
+      throw new Error('Login gagal');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
-  }, [router, setUser, setIsAuthenticated, setItem]);
+  }, []);
 
-  // Register function
-  const register = useCallback(async (data: RegisterData) => {
-    setIsLoading(true);
+  const register = useCallback(async (name: string, email: string, password: string, role: string) => {
+    setLoading(true);
     try {
-      const response = await apiRegister(data);
+      // Simulate registration for development
+      const userData = {
+        id: '1',
+        name,
+        email,
+        role,
+        lastLoginAt: new Date()
+      };
       
-      if (response.success) {
-        const { user, token } = response;
-        setUser(user);
-        setIsAuthenticated(true);
-        setItem('user', JSON.stringify(user));
-        setItem('token', token);
-        
-        // Redirect to onboarding
-        router.push('/onboarding');
-        return { success: true };
-      } else {
-        return { success: false, error: response.error || 'Registration failed' };
-      }
-    } catch (error: any) {
+      // Convert Date to string for storage
+      const userForStorage = {
+        ...userData,
+        lastLoginAt: userData.lastLoginAt instanceof Date 
+          ? userData.lastLoginAt.toISOString() 
+          : userData.lastLoginAt
+      };
+      
+      localStorage.setItem('token', 'mock-jwt-token');
+      localStorage.setItem('user', JSON.stringify(userForStorage));
+      
+      // Set user state
+      safeSetUser(userData);
+      return userData;
+    } catch (error) {
       console.error('Registration error:', error);
-      return { success: false, error: error.message || 'An unexpected error occurred' };
+      throw new Error('Registrasi gagal');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
-  }, [router, setUser, setIsAuthenticated, setItem]);
+  }, []);
 
-  // Logout function
-  const logout = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      await apiLogout();
-      clearAuth();
-      removeItem('user');
-      removeItem('token');
-      router.push('/login');
-      return { success: true };
-    } catch (error: any) {
-      console.error('Logout error:', error);
-      return { success: false, error: error.message };
-    } finally {
-      setIsLoading(false);
-    }
-  }, [router, clearAuth, removeItem]);
+  const logout = useCallback(() => {
+    // Clear localStorage
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    
+    // Reset state
+    setUser(null);
+    
+    // Redirect to login page
+    router.push('/auth/login');
+  }, [router]);
+
+  // Check if user is authenticated
+  const isAuthenticated = !!user;
 
   return {
     user,
+    loading,
     isAuthenticated,
-    isLoading,
     login,
     register,
     logout
   };
-};
+}

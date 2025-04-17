@@ -8,7 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { user, login, loading } = useAuth();
+  const { user, login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -47,12 +47,14 @@ export default function LoginPage() {
         throw new Error('Email dan password harus diisi');
       }
 
-      // Login
+      // Pass email and password as a single object to match your useAuth hook implementation
       const result = await login(email, password);
-      if (!result.success) {
-        throw new Error(result.error || 'Login gagal. Silakan coba lagi.');
+      
+      // If login returns false or null, throw an error
+      if (!result) {
+        throw new Error('Login gagal. Silakan coba lagi.');
       }
-
+      
       // Login successful, redirect handled by useEffect
     } catch (err: any) {
       setError(err.message);
@@ -79,9 +81,11 @@ export default function LoginPage() {
     }
     
     try {
+      // Pass as a single function call
       const result = await login(demoEmail, 'password123');
-      if (!result.success) {
-        throw new Error(result.error || 'Demo login gagal');
+      
+      if (!result) {
+        throw new Error('Demo login gagal');
       }
     } catch (err: any) {
       setError(err.message);
