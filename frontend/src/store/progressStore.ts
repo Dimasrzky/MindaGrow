@@ -1,67 +1,193 @@
 import { create } from 'zustand';
-import { ProgressData, Skill } from '@/hooks/useProgress';
+import { useAuthStore } from './authStore';
 
-interface ProgressState {
-  progress: ProgressData | null;
-  setProgress: (data: ProgressData) => void;
-  updateSkills: (skillsGained: Record<string, number>) => void;
-  addPoints: (points: number) => void;
-  resetProgress: () => void;
+export interface ProgressItem {
+  id: string;
+  userId: string;
+  materialId: string;
+  completionPercentage: number;
+  score: number;
+  timeSpent: number; // in seconds
+  lastAccessedAt: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export const progressStore = create<ProgressState>((set) => ({
-  progress: null,
+export interface SkillProgress {
+  skillId: string;
+  skillName: string;
+  level: number;
+  progressPercentage: number;
+}
+
+export interface SubjectProgress {
+  subjectId: string;
+  subjectName: string;
+  averageScore: number;
+  completedActivities: number;
+  totalActivities: number;
+}
+
+interface ProgressState {
+  learningProgress: ProgressItem[];
+  skills: SkillProgress[];
+  subjects: SubjectProgress[];
+  isLoading: boolean;
+  error: string | null;
   
-  setProgress: (data) => set({ progress: data }),
+  // Actions
+  fetchUserProgress: (userId?: string) => Promise<void>;
+  updateProgress: (progressData: Partial<ProgressItem>) => Promise<boolean>;
+  fetchSkillProgress: (userId?: string) => Promise<void>;
+  fetchSubjectProgress: (userId?: string) => Promise<void>;
+}
+
+export const useProgressStore = create<ProgressState>()((set, get) => ({
+  learningProgress: [],
+  skills: [],
+  subjects: [],
+  isLoading: false,
+  error: null,
   
-  updateSkills: (skillsGained) => set((state) => {
-    if (!state.progress) return state;
-    
-    // Create a copy of the current skills array
-    const updatedSkills = [...state.progress.skills];
-    
-    // Update each skill with the gained values
-    Object.entries(skillsGained).forEach(([skillName, gainedValue]) => {
-      const skillIndex = updatedSkills.findIndex(skill => skill.name === skillName);
+  fetchUserProgress: async (userId) => {
+    try {
+      set({ isLoading: true, error: null });
       
-      if (skillIndex !== -1) {
-        // Update existing skill
-        updatedSkills[skillIndex] = {
-          ...updatedSkills[skillIndex],
-          value: Math.min(
-            updatedSkills[skillIndex].value + gainedValue,
-            updatedSkills[skillIndex].maxValue
-          ),
-        };
-      } else {
-        // Add new skill
-        updatedSkills.push({
-          name: skillName,
-          value: gainedValue,
-          maxValue: 100, // Default max value
-        });
+      const auth = useAuthStore.getState();
+      const targetUserId = userId || auth.user?.id;
+      
+      if (!targetUserId) {
+        throw new Error('User ID is required to fetch progress');
       }
-    });
-    
-    return {
-      progress: {
-        ...state.progress,
-        skills: updatedSkills,
-      },
-    };
-  }),
+      
+      const response = await fetch(`/api/progress/user/${targetUserId}`, {
+        headers: {
+          Authorization: `Bearer ${auth.token}`,
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch progress data');
+      }
+      
+      const data = await response.json();
+      
+      set({
+        learningProgress: data.progress,
+        isLoading: false,
+      });
+    } catch (error) {
+      set({
+        isLoading: false,
+        error: error instanceof Error ? error.message : 'An unknown error occurred',
+      });
+    }
+  },
   
-  addPoints: (points) => set((state) => {
-    if (!state.progress) return state;
-    
-    return {
-      progress: {
-        ...state.progress,
-        totalPoints: state.progress.totalPoints + points,
-        pointsChange: state.progress.pointsChange + points,
-      },
-    };
-  }),
+  updateProgress: async (progressData) => {
+    try {
+      set({ isLoading: true, error: null });
+      
+      const auth = useAuthStore.getState();
+      
+      if (!auth.isAuthenticated) {
+        throw new Error('User must be authenticated to update progress');
+      }
+      
+      const response = await fetch('/api/progress/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${auth.token}`,
+        },
+        body: JSON.stringify(progressData),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to update progress');
+      }
+      
+      // Refresh progress data
+      await get().fetchUserProgress();
+      
+      set({ isLoading: false });
+      return true;
+    } catch (error) {
+      set({
+        isLoading: false,
+        error: error instanceof Error ? error.message : 'An unknown error occurred',
+      });
+      return false;
+    }
+  },
   
-  resetProgress: () => set({ progress: null }),
+  fetchSkillProgress: async (userId) => {
+    try {
+      set({ isLoading: true, error: null });
+      
+      const auth = useAuthStore.getState();
+      const targetUserId = userId || auth.user?.id;
+      
+      if (!targetUserId) {
+        throw new Error('User ID is required to fetch skill progress');
+      }
+      
+      const response = await fetch(`/api/progress/skills/${targetUserId}`, {
+        headers: {
+          Authorization: `Bearer ${auth.token}`,
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch skill progress data');
+      }
+      
+      const data = await response.json();
+      
+      set({
+        skills: data.skills,
+        isLoading: false,
+      });
+    } catch (error) {
+      set({
+        isLoading: false,
+        error: error instanceof Error ? error.message : 'An unknown error occurred',
+      });
+    }
+  },
+  
+  fetchSubjectProgress: async (userId) => {
+    try {
+      set({ isLoading: true, error: null });
+      
+      const auth = useAuthStore.getState();
+      const targetUserId = userId || auth.user?.id;
+      
+      if (!targetUserId) {
+        throw new Error('User ID is required to fetch subject progress');
+      }
+      
+      const response = await fetch(`/api/progress/subjects/${targetUserId}`, {
+        headers: {
+          Authorization: `Bearer ${auth.token}`,
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch subject progress data');
+      }
+      
+      const data = await response.json();
+      
+      set({
+        subjects: data.subjects,
+        isLoading: false,
+      });
+    } catch (error) {
+      set({
+        isLoading: false,
+        error: error instanceof Error ? error.message : 'An unknown error occurred',
+      });
+    }
+  },
 }));

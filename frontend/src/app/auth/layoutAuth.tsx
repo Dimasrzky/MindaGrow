@@ -1,43 +1,70 @@
-export default function AuthLayout({
-    children,
-  }: {
-    children: React.ReactNode
-  }) {
-    return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
-        <div className="container relative flex min-h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
-          <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r">
-            <div className="absolute inset-0 bg-primary" />
-            <div className="relative z-20 flex items-center text-lg font-medium">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="mr-2 h-6 w-6"
-              >
-                <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
-              </svg>
-              MindaGrow
-            </div>
-            <div className="relative z-20 mt-auto">
-              <blockquote className="space-y-2">
-                <p className="text-lg">
-                  &ldquo;Platform pendidikan anak personalisasi yang memadukan gamifikasi dengan analisis perkembangan kognitif untuk menciptakan pengalaman belajar yang optimal.&rdquo;
-                </p>
-                <footer className="text-sm">MindaGrow Team</footer>
-              </blockquote>
-            </div>
+import React from 'react';
+import type { ReactNode } from 'react';
+import { Logo } from '@/components/common/logo';
+import { HeroAnimation } from '@/components/common/hero-animation';
+import Link from 'next/link';
+
+interface AuthLayoutProps {
+  children: ReactNode;
+}
+
+export default function AuthLayout({ children }: AuthLayoutProps) {
+  return (
+    <div className="flex min-h-screen bg-gradient-to-r from-blue-50 to-indigo-50">
+      {/* Left side - Form */}
+      <div className="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
+        <div className="mx-auto w-full max-w-sm lg:w-96">
+          <div className="mb-8">
+            <Link href="/" className="inline-block">
+              <Logo />
+            </Link>
+            <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Welcome to MindaGrow</h2>
+            <p className="mt-2 text-sm text-gray-600">
+              Personalized education for your child's unique journey
+            </p>
           </div>
-          <div className="lg:p-8">
-            <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-              {children}
+          
+          {/* Auth form will be rendered here */}
+          <div className="bg-white p-8 shadow rounded-lg">
+            {children}
+          </div>
+        </div>
+      </div>
+      
+      {/* Right side - Illustration/Animation */}
+      <div className="hidden lg:block relative flex-1 bg-indigo-100">
+        <div className="absolute inset-0 flex items-center justify-center p-8">
+          <div className="w-full max-w-md">
+            <HeroAnimation />
+            <div className="mt-8 text-center">
+              <h3 className="text-xl font-semibold text-indigo-900">Unlock your child's potential</h3>
+              <p className="mt-2 text-indigo-700">
+                Personalized learning experiences that adapt to your child's unique abilities
+              </p>
+              
+              {/* Feature highlights */}
+              <div className="mt-8 grid grid-cols-2 gap-4">
+                <div className="bg-white bg-opacity-75 p-4 rounded-lg shadow-sm">
+                  <div className="text-indigo-600 font-semibold">AI-Powered Learning</div>
+                  <div className="text-sm text-gray-600">Content adapted to your child's needs</div>
+                </div>
+                <div className="bg-white bg-opacity-75 p-4 rounded-lg shadow-sm">
+                  <div className="text-indigo-600 font-semibold">Gamified Experience</div>
+                  <div className="text-sm text-gray-600">Making learning fun and engaging</div>
+                </div>
+                <div className="bg-white bg-opacity-75 p-4 rounded-lg shadow-sm">
+                  <div className="text-indigo-600 font-semibold">Progress Tracking</div>
+                  <div className="text-sm text-gray-600">Real-time insights on development</div>
+                </div>
+                <div className="bg-white bg-opacity-75 p-4 rounded-lg shadow-sm">
+                  <div className="text-indigo-600 font-semibold">Expert Guidance</div>
+                  <div className="text-sm text-gray-600">Educational support when needed</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    )
-  }
+    </div>
+  );
+}
